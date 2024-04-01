@@ -124,8 +124,8 @@ def calcular_frequencia(texto):
     return frequencia
 
 # Frequências médias das letras em inglês e português
-frequencias_ingles = {'E': 12.7, 'T': 9.1, 'A': 8.2, 'O': 7.5, 'I': 7.0, 'N': 6.7, 'S': 6.3, 'H': 6.1, 'R': 6.0, 'D': 4.3}
-frequencias_portugues = {'A': 14.6, 'E': 12.4, 'O': 10.7, 'S': 7.8, 'R': 6.5, 'I': 6.2, 'N': 5.0, 'D': 4.9, 'M': 4.7, 'U': 4.6}
+#frequencias_ingles = {'E': 12.7, 'T': 9.1, 'A': 8.2, 'O': 7.5, 'I': 7.0, 'N': 6.7, 'S': 6.3, 'H': 6.1, 'R': 6.0, 'D': 4.3}
+#frequencias_portugues = {'A': 14.6, 'E': 12.4, 'O': 10.7, 'S': 7.8, 'R': 6.5, 'I': 6.2, 'N': 5.0, 'D': 4.9, 'M': 4.7, 'U': 4.6}
 
 # Função para calcular a similaridade entre as frequências do texto cifrado e as frequências de uma língua
 def calcular_similaridade(frequencias_texto, frequencias_lingua):
@@ -148,32 +148,48 @@ def determinar_idioma(texto_cifrado):
     frequencia = calcular_frequencia(texto_cifrado)
     
     # Calculando a similaridade com inglês e português
-    similaridade_ingles = calcular_similaridade(frequencia, frequencias_ingles)
-    similaridade_portugues = calcular_similaridade(frequencia, frequencias_portugues)
+    similaridade_ingles = calcular_similaridade(frequencia, frequencia_ingles)
+    similaridade_portugues = calcular_similaridade(frequencia, frequencia_portugues)
     return "portugues" if similaridade_portugues > similaridade_ingles else "ingles"
 
 # Função principal do programa
 def decifrar_texto(caminho_do_arquivo):
-    print("Lendo o texto cifrado...")
+
     texto_cifrado = ler_texto_cifrado(caminho_do_arquivo).lower()
 
-    print("Determinando o idioma...")
+
     idioma = determinar_idioma(texto_cifrado)
     frequencia_idioma = frequencia_portugues if idioma == "portugues" else frequencia_ingles
 
-    print("Encontrando o tamanho da chave usando o Índice de Coincidência...")
+
     tamanho_chave = encontrar_tamanho_chave_ic(texto_cifrado, idioma)
 
-    print("Calculando a chave otimizada...")
+
     chave = calcular_chave_otimizada(texto_cifrado, tamanho_chave, frequencia_idioma)
 
-    print("Decifrando o texto...")
+
     texto_decifrado = decifrar_com_vigenere(texto_cifrado, chave)
 
-    return texto_decifrado, idioma
+    return (texto_decifrado, idioma)
 
 
 # Executar o programa
 caminho_do_arquivo = "./20201-teste2.txt"
-resultado = decifrar_texto(caminho_do_arquivo)
-print("Texto Decifrado:", resultado)
+import threading
+
+def thread_function(i):
+    texto, idioma = decifrar_texto("./testFiles/cipher"+str(i)+".txt")
+    print("Decifrando arquivo: cipher", i, "Texto Decifrado no idioma", texto[:40], "no idioma:", idioma)
+
+for i in range(1, 31, 3):
+    threads = []
+
+    # Criando e iniciando um grupo de três threads
+    for j in range(i, min(i+3, 31)):
+        thread = threading.Thread(target=thread_function, args=(j,))
+        threads.append(thread)
+        thread.start()
+
+    # Aguardando as threads deste grupo terminarem
+    for thread in threads:
+        thread.join()
