@@ -112,21 +112,28 @@ def calcular_chave_otimizada(texto_cifrado, tamanho_chave, frequencia_idioma):
 
 # Implementação para determinar o idioma
 
+def calcular_frequencia(texto):
+    texto = texto.replace(" ", "").upper()
+    frequencia = {}
+    for letra in texto:
+        if letra.isalpha():
+            frequencia[letra] = frequencia.get(letra, 0) + 1
+    total_letras = sum(frequencia.values())
+    for letra in frequencia:
+        frequencia[letra] = (frequencia[letra] / total_letras) * 100
+    return frequencia
 
-def determinar_idioma(texto_cifrado, frequencia_portugues, frequencia_ingles):
-    contador = Counter([letra for letra in texto_cifrado if letra.isalpha()])
-    total_letras = sum(contador.values())
+# Frequências médias das letras em inglês e português
+frequencias_ingles = {'E': 12.7, 'T': 9.1, 'A': 8.2, 'O': 7.5, 'I': 7.0, 'N': 6.7, 'S': 6.3, 'H': 6.1, 'R': 6.0, 'D': 4.3}
+frequencias_portugues = {'A': 14.6, 'E': 12.4, 'O': 10.7, 'S': 7.8, 'R': 6.5, 'I': 6.2, 'N': 5.0, 'D': 4.9, 'M': 4.7, 'U': 4.6}
 
-    # Pré-calcula as frequências relativas
-    freq_relativa = {letra: (contador[letra] / total_letras) * 100 for letra in contador}
-
-    dif_portugues, dif_ingles = 0, 0
-    for letra in tqdm(string.ascii_lowercase, desc="Calculando diferenças de frequência"):
-        freq_real = freq_relativa.get(letra, 0)
-        dif_portugues += abs(freq_real - frequencia_portugues.get(letra, 0))
-        dif_ingles += abs(freq_real - frequencia_ingles.get(letra, 0))
-
-    return "portugues" if dif_portugues < dif_ingles else "ingles"
+# Função para calcular a similaridade entre as frequências do texto cifrado e as frequências de uma língua
+def calcular_similaridade(frequencias_texto, frequencias_lingua):
+    similaridade = 0
+    for letra, freq in frequencias_texto.items():
+        if letra in frequencias_lingua:
+            similaridade += min(freq, frequencias_lingua[letra])
+    return similaridade
 
 
 # Função para decifrar o texto usando a Cifra de Vigenère
@@ -135,13 +142,23 @@ def decifrar_com_vigenere(texto_cifrado, chave):
     return vigenere.decipher(texto_cifrado)
 
 
+
+def determinar_idioma(texto_cifrado):
+
+    frequencia = calcular_frequencia(texto_cifrado)
+    
+    # Calculando a similaridade com inglês e português
+    similaridade_ingles = calcular_similaridade(frequencia, frequencias_ingles)
+    similaridade_portugues = calcular_similaridade(frequencia, frequencias_portugues)
+    return "portugues" if similaridade_portugues > similaridade_ingles else "ingles"
+
 # Função principal do programa
 def decifrar_texto(caminho_do_arquivo):
     print("Lendo o texto cifrado...")
     texto_cifrado = ler_texto_cifrado(caminho_do_arquivo).lower()
 
     print("Determinando o idioma...")
-    idioma = determinar_idioma(texto_cifrado, frequencia_portugues, frequencia_ingles)
+    idioma = determinar_idioma(texto_cifrado)
     frequencia_idioma = frequencia_portugues if idioma == "portugues" else frequencia_ingles
 
     print("Encontrando o tamanho da chave usando o Índice de Coincidência...")
@@ -157,6 +174,6 @@ def decifrar_texto(caminho_do_arquivo):
 
 
 # Executar o programa
-caminho_do_arquivo = "C:/Users/cassi/OneDrive - PUCRS - BR/Faculdade/VIII Semestre/Segurança de Sistemas/T1/20201-teste2.txt"
+caminho_do_arquivo = "./20201-teste2.txt"
 resultado = decifrar_texto(caminho_do_arquivo)
 print("Texto Decifrado:", resultado)
