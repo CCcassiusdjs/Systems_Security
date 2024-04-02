@@ -1,10 +1,5 @@
 from pycipher import Vigenere
-import re
-from collections import defaultdict, Counter
-import itertools
-import string
-from math import gcd
-from tqdm import tqdm
+from collections import Counter
 
 
 # Parte 1: Leitura do Texto Cifrado
@@ -101,7 +96,7 @@ frequencia_ingles = {
 # Implementação para calcular a chave mais provável
 def calcular_chave_otimizada(texto_cifrado, tamanho_chave, frequencia_idioma):
     chave_otimizada = ''
-    for i in tqdm(range(tamanho_chave), desc="Calculando chave otimizada"):  # Adicionando a barra de progresso aqui
+    for i in range(tamanho_chave):
         segmento = texto_cifrado[i::tamanho_chave]
         contador = Counter(segmento)
         letra_mais_frequente = max(contador, key=contador.get)
@@ -122,10 +117,6 @@ def calcular_frequencia(texto):
     for letra in frequencia:
         frequencia[letra] = (frequencia[letra] / total_letras) * 100
     return frequencia
-
-# Frequências médias das letras em inglês e português
-#frequencias_ingles = {'E': 12.7, 'T': 9.1, 'A': 8.2, 'O': 7.5, 'I': 7.0, 'N': 6.7, 'S': 6.3, 'H': 6.1, 'R': 6.0, 'D': 4.3}
-#frequencias_portugues = {'A': 14.6, 'E': 12.4, 'O': 10.7, 'S': 7.8, 'R': 6.5, 'I': 6.2, 'N': 5.0, 'D': 4.9, 'M': 4.7, 'U': 4.6}
 
 # Função para calcular a similaridade entre as frequências do texto cifrado e as frequências de uma língua
 def calcular_similaridade(frequencias_texto, frequencias_lingua):
