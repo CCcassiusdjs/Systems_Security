@@ -201,14 +201,18 @@ def decifrar_texto(caminho_do_arquivo):
 
 
 # Executar o programa
-caminho_do_arquivo = "./20201-teste2.txt"
-texto, idioma = decifrar_texto(caminho_do_arquivo)
-print("Texto Decifrado no idioma", texto[:40], "no idioma:", idioma)
+caminho_do_arquivo_PT = "./20201-teste-PT.txt"
+caminho_do_arquivo_EN = "./20201-teste-EN.txt"
+for file in [caminho_do_arquivo_PT, caminho_do_arquivo_EN]:
+    texto, idioma = decifrar_texto(caminho_do_arquivo_PT)
+    print("Testes base. Texto Decifrado no idioma", texto[:40], "no idioma:", idioma)
+    
+print("-------")
 import threading
 
 def thread_function(i):
     texto, idioma = decifrar_texto("./testFiles/cipher"+str(i)+".txt")
-    print("Decifrando arquivo: cipher", i, "Texto Decifrado no idioma", texto[:40], "no idioma:", idioma)
+    print("Decifrando arquivo teste: cipher", i, "Texto Decifrado no idioma", texto[:40], "no idioma:", idioma)
 
 for i in range(1, 31, 3):
     threads = []
