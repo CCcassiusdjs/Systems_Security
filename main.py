@@ -2,6 +2,7 @@ from pycipher import Vigenere
 from collections import Counter
 
 
+
 # Parte 1: Leitura do Texto Cifrado
 def ler_texto_cifrado(caminho_do_arquivo):
     with open(caminho_do_arquivo, 'r') as arquivo:
@@ -15,8 +16,7 @@ def indice_de_coincidencia(segmento):
     return ic
 
 
-def encontrar_tamanho_chave_ic(texto_cifrado, idioma='ingles'):
-    IC_ESPERADO = 0.065  # Valor típico para inglês
+def encontrar_tamanho_chave_ic(texto_cifrado, IC_ESPERADO):
     tamanho_max_chave = 20  # Um limite razoável para o tamanho da chave
     melhor_tamanho = 1
     melhor_diferenca = float('inf')
@@ -105,7 +105,15 @@ def calcular_chave_otimizada(texto_cifrado, tamanho_chave, frequencia_idioma):
     return chave_otimizada
 
 
-# Implementação para determinar o idioma
+
+
+
+
+# Função para decifrar o texto usando a Cifra de Vigenère
+def decifrar_com_vigenere(texto_cifrado, chave):
+    vigenere = Vigenere(chave)
+    return vigenere.decipher(texto_cifrado)
+
 
 def calcular_frequencia(texto):
     texto = texto.replace(" ", "").upper()
@@ -118,43 +126,71 @@ def calcular_frequencia(texto):
         frequencia[letra] = (frequencia[letra] / total_letras) * 100
     return frequencia
 
-# Função para calcular a similaridade entre as frequências do texto cifrado e as frequências de uma língua
-def calcular_similaridade(frequencias_texto, frequencias_lingua):
-    similaridade = 0
-    for letra, freq in frequencias_texto.items():
-        if letra in frequencias_lingua:
-            similaridade += min(freq, frequencias_lingua[letra])
-    return similaridade
 
 
-# Função para decifrar o texto usando a Cifra de Vigenère
-def decifrar_com_vigenere(texto_cifrado, chave):
-    vigenere = Vigenere(chave)
-    return vigenere.decipher(texto_cifrado)
+def calcular_qui_quadrado(observado, esperado):
+    qui_quadrado = 0
+    for letra in observado:
+        qui_quadrado += ((observado.get(letra, 0) - esperado.get(letra, 0)) ** 3) / esperado.get(letra, 1)
+    return qui_quadrado
+
+def determinar_idioma_qui_quadrado(texto_cifrado, frequencia_esperada_ingles, frequencia_esperada_portugues):
+    frequencia_observada = calcular_frequencia(texto_cifrado)
+
+    qui_quadrado_ingles = calcular_qui_quadrado(frequencia_observada, frequencia_esperada_ingles)
+    qui_quadrado_portugues = calcular_qui_quadrado(frequencia_observada, frequencia_esperada_portugues)
 
 
+    return "portugues" if qui_quadrado_portugues < qui_quadrado_ingles else "ingles"
 
-def determinar_idioma(texto_cifrado):
 
-    frequencia = calcular_frequencia(texto_cifrado)
-    
-    # Calculando a similaridade com inglês e português
-    similaridade_ingles = calcular_similaridade(frequencia, frequencia_ingles)
-    similaridade_portugues = calcular_similaridade(frequencia, frequencia_portugues)
-    return "portugues" if similaridade_portugues > similaridade_ingles else "ingles"
 
 # Função principal do programa
 def decifrar_texto(caminho_do_arquivo):
 
     texto_cifrado = ler_texto_cifrado(caminho_do_arquivo).lower()
+    
+    frequencia_ingles_10 = {
+    'E': 12.702,
+    'T': 9.056,
+    'A': 8.167,
+    'O': 7.507,
+    'I': 6.966,
+    'N': 6.749,
+    'S': 6.327,
+    'H': 6.094,
+    'R': 5.987,
+    'D': 4.253,
+    'L': 4.025,
+    'C': 2.782,
+    'U': 2.758
+}
 
+    frequencia_portugues_10 = {
+    'A': 14.63,
+    'E': 12.57,
+    'O': 10.73,
+    'S': 7.81,
+    'R': 6.53,
+    'I': 6.18,
+    'N': 5.05,
+    'D': 4.99,
+    'M': 4.74,
+    'U': 4.63,
+    'T': 4.34,
+    'C': 3.88,
+    'L': 2.78
+}
 
-    idioma = determinar_idioma(texto_cifrado)
+    idioma = determinar_idioma_qui_quadrado(texto_cifrado,frequencia_ingles_10,frequencia_portugues_10 )
+    
     frequencia_idioma = frequencia_portugues if idioma == "portugues" else frequencia_ingles
 
-
-    tamanho_chave = encontrar_tamanho_chave_ic(texto_cifrado, idioma)
-
+    IC_ingles = 0.0667
+    IC_portugues = 0.0745
+    IC_ESPERADO = IC_ingles if idioma == "ingles" else IC_portugues
+    
+    tamanho_chave = encontrar_tamanho_chave_ic(texto_cifrado, IC_ESPERADO)
 
     chave = calcular_chave_otimizada(texto_cifrado, tamanho_chave, frequencia_idioma)
 
@@ -166,13 +202,15 @@ def decifrar_texto(caminho_do_arquivo):
 
 # Executar o programa
 caminho_do_arquivo = "./20201-teste2.txt"
+texto, idioma = decifrar_texto(caminho_do_arquivo)
+print("Texto Decifrado no idioma", texto[:40], "no idioma:", idioma)
 import threading
 
 def thread_function(i):
     texto, idioma = decifrar_texto("./testFiles/cipher"+str(i)+".txt")
     print("Decifrando arquivo: cipher", i, "Texto Decifrado no idioma", texto[:40], "no idioma:", idioma)
 
-for i in range(1, 31, 3):
+for i in range(1, 9, 3):
     threads = []
 
     # Criando e iniciando um grupo de três threads
