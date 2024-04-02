@@ -128,20 +128,21 @@ def calcular_frequencia(texto):
 
 
 
-def calcular_qui_quadrado(observado, esperado):
+def calcular_qui_cubo_alterado(observado, esperado):
     qui_quadrado = 0
     for letra in observado:
-        qui_quadrado += ((observado.get(letra, 0) - esperado.get(letra, 0)) ** 3) / esperado.get(letra, 1)
+        if letra in esperado:
+            qui_quadrado += ((observado.get(letra, 0) - esperado.get(letra, 0)) ** 3) / esperado.get(letra, 1)
     return qui_quadrado
 
-def determinar_idioma_qui_quadrado(texto_cifrado, frequencia_esperada_ingles, frequencia_esperada_portugues):
+def determinar_idioma_qui_cubo_alterado(texto_cifrado, frequencia_esperada_ingles, frequencia_esperada_portugues):
     frequencia_observada = calcular_frequencia(texto_cifrado)
 
-    qui_quadrado_ingles = calcular_qui_quadrado(frequencia_observada, frequencia_esperada_ingles)
-    qui_quadrado_portugues = calcular_qui_quadrado(frequencia_observada, frequencia_esperada_portugues)
+    qui_quadrado_ingles = calcular_qui_cubo_alterado(frequencia_observada, frequencia_esperada_ingles)
+    qui_quadrado_portugues = calcular_qui_cubo_alterado(frequencia_observada, frequencia_esperada_portugues)
 
 
-    return "portugues" if qui_quadrado_portugues < qui_quadrado_ingles else "ingles"
+    return "portugues" if float(qui_quadrado_portugues) < float(qui_quadrado_ingles) else "ingles"
 
 
 
@@ -182,8 +183,8 @@ def decifrar_texto(caminho_do_arquivo):
     'L': 2.78
 }
 
-    idioma = determinar_idioma_qui_quadrado(texto_cifrado,frequencia_ingles_10,frequencia_portugues_10 )
-    
+    idioma = determinar_idioma_qui_cubo_alterado(texto_cifrado,frequencia_ingles_10,frequencia_portugues_10 )
+    #idioma = "portugues"
     frequencia_idioma = frequencia_portugues if idioma == "portugues" else frequencia_ingles
 
     IC_ingles = 0.0667
@@ -193,7 +194,6 @@ def decifrar_texto(caminho_do_arquivo):
     tamanho_chave = encontrar_tamanho_chave_ic(texto_cifrado, IC_ESPERADO)
 
     chave = calcular_chave_otimizada(texto_cifrado, tamanho_chave, frequencia_idioma)
-
 
     texto_decifrado = decifrar_com_vigenere(texto_cifrado, chave)
 
@@ -214,6 +214,7 @@ def thread_function(i):
     texto, idioma = decifrar_texto("./testFiles/cipher"+str(i)+".txt")
     print("Decifrando arquivo teste: cipher", i, "Texto Decifrado no idioma", texto[:40], "no idioma:", idioma)
 
+#for i in [1,14,23]:
 for i in range(1, 31, 3):
     threads = []
 
