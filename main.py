@@ -215,15 +215,12 @@ def thread_function(i):
     print("Decifrando arquivo teste: cipher", i, "Texto Decifrado no idioma", texto[:40], "no idioma:", idioma)
 
 #for i in [1,14,23]:
-for i in range(1, 31, 3):
-    threads = []
+threads = []
+for i in range(1, 31):
+    thread = threading.Thread(target=thread_function, args=(i,))
+    threads.append(thread)
+    thread.start()
+    
+for thread in threads:
+    thread.join()
 
-    # Criando e iniciando um grupo de três threads
-    for j in range(i, min(i+3, 31)):
-        thread = threading.Thread(target=thread_function, args=(j,))
-        threads.append(thread)
-        thread.start()
-
-    # Aguardando as threads deste grupo terminarem
-    for thread in threads:
-        thread.join()
