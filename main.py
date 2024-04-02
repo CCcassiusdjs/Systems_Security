@@ -210,7 +210,7 @@ def thread_function(i):
     texto, idioma = decifrar_texto("./testFiles/cipher"+str(i)+".txt")
     print("Decifrando arquivo: cipher", i, "Texto Decifrado no idioma", texto[:40], "no idioma:", idioma)
 
-for i in range(1, 9, 3):
+for i in range(1, 31, 3):
     threads = []
 
     # Criando e iniciando um grupo de três threads
