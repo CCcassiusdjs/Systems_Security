@@ -158,8 +158,6 @@ def determinar_idioma_qui_cubo_alterado(texto_cifrado, frequencia_esperada_ingle
 
 # Função principal do programa
 def decifrar_texto(caminho_do_arquivo):
-
-    texto_cifrado = ler_texto_cifrado(caminho_do_arquivo).lower()
     
     frequencia_ingles_10 = {
     'E': 12.702,
@@ -192,6 +190,8 @@ def decifrar_texto(caminho_do_arquivo):
     'C': 3.88,
     'L': 2.78
 }
+
+    texto_cifrado = ler_texto_cifrado(caminho_do_arquivo).lower()
 
     idioma = determinar_idioma_qui_cubo_alterado(texto_cifrado,frequencia_ingles_10,frequencia_portugues_10 )
     #idioma = "portugues"
