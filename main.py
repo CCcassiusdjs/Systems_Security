@@ -58,16 +58,16 @@ caminho_do_arquivo_PT = "./20201-teste-PT.txt"
 caminho_do_arquivo_EN = "./20201-teste-EN.txt"
 for file in [caminho_do_arquivo_PT, caminho_do_arquivo_EN]:
     respostas = decifrar_texto(caminho_do_arquivo_PT)
-    for r in respostas:
-        texto, idioma = r
-        print("Testes base. Texto Decifrado no idioma", texto[:40], "no idioma:", idioma)
     
     
 caminho_do_arquivo_PT = "./20201-teste-PT.txt"
 caminho_do_arquivo_EN = "./20201-teste-EN.txt"
 for file in [caminho_do_arquivo_PT, caminho_do_arquivo_EN]:
-    r = decifrar_texto(file)
-    print(r)
+    respostas = decifrar_texto(file)
+    for r in respostas:
+        texto, idioma = r
+        print("Testes base. Texto Decifrado no idioma", texto[:40], "no idioma:", idioma)
+    
     
     
   
