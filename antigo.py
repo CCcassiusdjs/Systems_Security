@@ -8,7 +8,7 @@ Created on Thu Apr  4 14:40:59 2024
 
 from pycipher import Vigenere
 import re
-from collections import defaultdict, Counter
+from collections import Counter
 import itertools
 import string
 from math import gcd
@@ -21,29 +21,7 @@ def ler_texto_cifrado(caminho_do_arquivo):
         return arquivo.read()
 
 
-def indice_de_coincidencia(segmento):
-    n = len(segmento)
-    freqs = Counter(segmento)
-    ic = sum(f * (f - 1) for f in freqs.values()) / (n * (n - 1))
-    return ic
 
-
-def encontrar_tamanho_chave_ic(texto_cifrado, idioma='ingles'):
-    IC_ESPERADO = 0.065  # Valor típico para inglês
-    tamanho_max_chave = 20  # Um limite razoável para o tamanho da chave
-    melhor_tamanho = 1
-    melhor_diferenca = float('inf')
-
-    for tamanho in range(1, tamanho_max_chave + 1):
-        segmentos = [''.join(texto_cifrado[i::tamanho]) for i in range(tamanho)]
-        ic_medio = sum(indice_de_coincidencia(segmento) for segmento in segmentos) / tamanho
-        diferenca = abs(IC_ESPERADO - ic_medio)
-
-        if diferenca < melhor_diferenca:
-            melhor_diferenca = diferenca
-            melhor_tamanho = tamanho
-
-    return melhor_tamanho
 
 
 # Parte 4: Tabelas de Frequência de Letras
@@ -160,6 +138,8 @@ def determinar_idioma(texto_cifrado):
     similaridade_portugues = calcular_similaridade(frequencia, frequencias_portugues)
     return "portugues" if similaridade_portugues > similaridade_ingles else "ingles"
 
+import encontrar_tamanho_chave_ic as ec
+import calcular_chave_otimizada as cco
 # Função principal do programa
 def decifrar_texto(caminho_do_arquivo):
     print("Lendo o texto cifrado...")
@@ -168,12 +148,15 @@ def decifrar_texto(caminho_do_arquivo):
     print("Determinando o idioma...")
     idioma = determinar_idioma(texto_cifrado)
     frequencia_idioma = frequencia_portugues if idioma == "portugues" else frequencia_ingles
-
-    print("Encontrando o tamanho da chave usando o Índice de Coincidência...")
-    tamanho_chave = encontrar_tamanho_chave_ic(texto_cifrado, idioma)
+    IC_ingles = 0.0667
+    IC_portugues = 0.0745
+    IC_ESPERADO = IC_ingles if idioma == "ingles" else IC_portugues
+    
+    tamanho_chave = ec.encontrar_tamanho_chave_ic(texto_cifrado, IC_ESPERADO)
     print("tamanho chave: ", tamanho_chave)
     print("Calculando a chave otimizada...")
-    chave = calcular_chave_otimizada(texto_cifrado, tamanho_chave, frequencia_idioma)
+
+    chave = cco.calcular_chave_otimizada(texto_cifrado, tamanho_chave, 'e')
 
     print("Decifrando o texto...")
     texto_decifrado = decifrar_com_vigenere(texto_cifrado, chave)
