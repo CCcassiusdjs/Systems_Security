@@ -25,10 +25,11 @@ def encontrar_tamanho_chave_ic(texto_cifrado, IC_ESPERADO):
         segmentos = [''.join(texto_cifrado[i::tamanho]) for i in range(tamanho)]
         ic_medio = sum(indice_de_coincidencia(segmento) for segmento in segmentos) / tamanho
         diferenca = abs(IC_ESPERADO - ic_medio)
-
-        if diferenca < melhor_diferenca:
+        
+        if diferenca*1.015 < melhor_diferenca: # tem que ser 1.5% melhor que a ultima chave
             melhor_diferenca = diferenca
             melhor_tamanho = tamanho
+
 
     return melhor_tamanho
 
@@ -216,7 +217,7 @@ def thread_function(i):
 
 #for i in [1,14,23]:
 threads = []
-for i in range(1, 31):
+for i in range(1, 3):
     thread = threading.Thread(target=thread_function, args=(i,))
     threads.append(thread)
     thread.start()
