@@ -1,10 +1,6 @@
 from pycipher import Vigenere
-import re
-from collections import defaultdict, Counter
-import itertools
-import string
-from math import gcd
-from tqdm import tqdm
+from collections import Counter
+
 
 
 # Parte 1: Leitura do Texto Cifrado
@@ -20,8 +16,7 @@ def indice_de_coincidencia(segmento):
     return ic
 
 
-def encontrar_tamanho_chave_ic(texto_cifrado, idioma='ingles'):
-    IC_ESPERADO = 0.065  # Valor típico para inglês
+def encontrar_tamanho_chave_ic(texto_cifrado, IC_ESPERADO):
     tamanho_max_chave = 20  # Um limite razoável para o tamanho da chave
     melhor_tamanho = 1
     melhor_diferenca = float('inf')
@@ -30,10 +25,11 @@ def encontrar_tamanho_chave_ic(texto_cifrado, idioma='ingles'):
         segmentos = [''.join(texto_cifrado[i::tamanho]) for i in range(tamanho)]
         ic_medio = sum(indice_de_coincidencia(segmento) for segmento in segmentos) / tamanho
         diferenca = abs(IC_ESPERADO - ic_medio)
-
-        if diferenca < melhor_diferenca:
+        
+        if diferenca*1.015 < melhor_diferenca: # tem que ser 1.5% melhor que a ultima chave
             melhor_diferenca = diferenca
             melhor_tamanho = tamanho
+
 
     return melhor_tamanho
 
@@ -99,34 +95,28 @@ frequencia_ingles = {
 
 
 # Implementação para calcular a chave mais provável
-def calcular_chave_otimizada(texto_cifrado, tamanho_chave, frequencia_idioma):
+def calcular_chave_otimizada(texto_cifrado, tamanho_chave, letra_mais_frequente_idioma):
     chave_otimizada = ''
-    for i in tqdm(range(tamanho_chave), desc="Calculando chave otimizada"):  # Adicionando a barra de progresso aqui
+    for i in range(tamanho_chave):
+        # Extrai o segmento do texto que corresponde à mesma posição da chave
         segmento = texto_cifrado[i::tamanho_chave]
+
+        # Conta a frequência das letras no segmento
         contador = Counter(segmento)
+
+        # Encontra a letra mais frequente no segmento
         letra_mais_frequente = max(contador, key=contador.get)
-        deslocamento = ord(letra_mais_frequente) - ord('e')  # 'e' é geralmente a letra mais frequente
+
+        # Calcula o deslocamento da letra mais frequente até a letra mais frequente do idioma
+        deslocamento = ord(letra_mais_frequente) - ord(letra_mais_frequente_idioma)
+
+        # Corrige o deslocamento e adiciona à chave
         chave_otimizada += chr((deslocamento + 26) % 26 + ord('a'))
     return chave_otimizada
 
 
-# Implementação para determinar o idioma
 
 
-def determinar_idioma(texto_cifrado, frequencia_portugues, frequencia_ingles):
-    contador = Counter([letra for letra in texto_cifrado if letra.isalpha()])
-    total_letras = sum(contador.values())
-
-    # Pré-calcula as frequências relativas
-    freq_relativa = {letra: (contador[letra] / total_letras) * 100 for letra in contador}
-
-    dif_portugues, dif_ingles = 0, 0
-    for letra in tqdm(string.ascii_lowercase, desc="Calculando diferenças de frequência"):
-        freq_real = freq_relativa.get(letra, 0)
-        dif_portugues += abs(freq_real - frequencia_portugues.get(letra, 0))
-        dif_ingles += abs(freq_real - frequencia_ingles.get(letra, 0))
-
-    return "portugues" if dif_portugues < dif_ingles else "ingles"
 
 
 # Função para decifrar o texto usando a Cifra de Vigenère
@@ -135,28 +125,115 @@ def decifrar_com_vigenere(texto_cifrado, chave):
     return vigenere.decipher(texto_cifrado)
 
 
+def calcular_frequencia(texto):
+    texto = texto.replace(" ", "").upper()
+    frequencia = {}
+    for letra in texto:
+        if letra.isalpha():
+            frequencia[letra] = frequencia.get(letra, 0) + 1
+    total_letras = sum(frequencia.values())
+    for letra in frequencia:
+        frequencia[letra] = (frequencia[letra] / total_letras) * 100
+    return frequencia
+
+
+
+def calcular_qui_cubo_alterado(observado, esperado):
+    qui_quadrado = 0
+    for letra in observado:
+        if letra in esperado:
+            qui_quadrado += ((observado.get(letra, 0) - esperado.get(letra, 0)) ** 3) / esperado.get(letra, 1)
+    return qui_quadrado
+
+def determinar_idioma_qui_cubo_alterado(texto_cifrado, frequencia_esperada_ingles, frequencia_esperada_portugues):
+    frequencia_observada = calcular_frequencia(texto_cifrado)
+
+    qui_quadrado_ingles = calcular_qui_cubo_alterado(frequencia_observada, frequencia_esperada_ingles)
+    qui_quadrado_portugues = calcular_qui_cubo_alterado(frequencia_observada, frequencia_esperada_portugues)
+
+
+    return "portugues" if float(qui_quadrado_portugues) < float(qui_quadrado_ingles) else "ingles"
+
+
+
 # Função principal do programa
 def decifrar_texto(caminho_do_arquivo):
-    print("Lendo o texto cifrado...")
-    texto_cifrado = ler_texto_cifrado(caminho_do_arquivo).lower()
 
-    print("Determinando o idioma...")
-    idioma = determinar_idioma(texto_cifrado, frequencia_portugues, frequencia_ingles)
+    texto_cifrado = ler_texto_cifrado(caminho_do_arquivo).lower()
+    
+    frequencia_ingles_10 = {
+    'E': 12.702,
+    'T': 9.056,
+    'A': 8.167,
+    'O': 7.507,
+    'I': 6.966,
+    'N': 6.749,
+    'S': 6.327,
+    'H': 6.094,
+    'R': 5.987,
+    'D': 4.253,
+    'L': 4.025,
+    'C': 2.782,
+    'U': 2.758
+}
+
+    frequencia_portugues_10 = {
+    'A': 14.63,
+    'E': 12.57,
+    'O': 10.73,
+    'S': 7.81,
+    'R': 6.53,
+    'I': 6.18,
+    'N': 5.05,
+    'D': 4.99,
+    'M': 4.74,
+    'U': 4.63,
+    'T': 4.34,
+    'C': 3.88,
+    'L': 2.78
+}
+
+    idioma = determinar_idioma_qui_cubo_alterado(texto_cifrado,frequencia_ingles_10,frequencia_portugues_10 )
+    #idioma = "portugues"
     frequencia_idioma = frequencia_portugues if idioma == "portugues" else frequencia_ingles
 
-    print("Encontrando o tamanho da chave usando o Índice de Coincidência...")
-    tamanho_chave = encontrar_tamanho_chave_ic(texto_cifrado, idioma)
+    IC_ingles = 0.0667
+    IC_portugues = 0.0745
+    IC_ESPERADO = IC_ingles if idioma == "ingles" else IC_portugues
+    
+    tamanho_chave = encontrar_tamanho_chave_ic(texto_cifrado, IC_ESPERADO)
+    ans = []
+    for l in ['a','e','t']:
+        chave = calcular_chave_otimizada(texto_cifrado, tamanho_chave, l)
+        texto_decifrado = decifrar_com_vigenere(texto_cifrado, chave)
+        ans.append((texto_decifrado, idioma))
 
-    print("Calculando a chave otimizada...")
-    chave = calcular_chave_otimizada(texto_cifrado, tamanho_chave, frequencia_idioma)
-
-    print("Decifrando o texto...")
-    texto_decifrado = decifrar_com_vigenere(texto_cifrado, chave)
-
-    return texto_decifrado, idioma
+    return ans
 
 
 # Executar o programa
-caminho_do_arquivo = "C:/Users/cassi/OneDrive - PUCRS - BR/Faculdade/VIII Semestre/Segurança de Sistemas/T1/20201-teste2.txt"
-resultado = decifrar_texto(caminho_do_arquivo)
-print("Texto Decifrado:", resultado)
+caminho_do_arquivo_PT = "./20201-teste-PT.txt"
+caminho_do_arquivo_EN = "./20201-teste-EN.txt"
+for file in [caminho_do_arquivo_PT, caminho_do_arquivo_EN]:
+    respostas = decifrar_texto(caminho_do_arquivo_PT)
+    for r in respostas:
+        texto, idioma = r
+        print("Testes base. Texto Decifrado no idioma", texto[:40], "no idioma:", idioma)
+    
+print("-------")
+import threading
+
+def thread_function(i):
+    texto, idioma = decifrar_texto("./testFiles/cipher"+str(i)+".txt")
+    print("Decifrando arquivo teste: cipher", i, "Texto Decifrado no idioma", texto[:40], "no idioma:", idioma)
+
+#
+threads = []
+for i in range(1, 0):
+    thread = threading.Thread(target=thread_function, args=(i,))
+    threads.append(thread)
+    thread.start()
+    
+for thread in threads:
+    thread.join()
+
