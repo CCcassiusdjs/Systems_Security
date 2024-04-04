@@ -95,13 +95,22 @@ frequencia_ingles = {
 
 
 # Implementação para calcular a chave mais provável
-def calcular_chave_otimizada(texto_cifrado, tamanho_chave, frequencia_idioma):
+def calcular_chave_otimizada(texto_cifrado, tamanho_chave, letra_mais_frequente_idioma):
     chave_otimizada = ''
     for i in range(tamanho_chave):
+        # Extrai o segmento do texto que corresponde à mesma posição da chave
         segmento = texto_cifrado[i::tamanho_chave]
+
+        # Conta a frequência das letras no segmento
         contador = Counter(segmento)
+
+        # Encontra a letra mais frequente no segmento
         letra_mais_frequente = max(contador, key=contador.get)
-        deslocamento = ord(letra_mais_frequente) - ord('e')  # 'e' é geralmente a letra mais frequente
+
+        # Calcula o deslocamento da letra mais frequente até a letra mais frequente do idioma
+        deslocamento = ord(letra_mais_frequente) - ord(letra_mais_frequente_idioma)
+
+        # Corrige o deslocamento e adiciona à chave
         chave_otimizada += chr((deslocamento + 26) % 26 + ord('a'))
     return chave_otimizada
 
@@ -193,20 +202,23 @@ def decifrar_texto(caminho_do_arquivo):
     IC_ESPERADO = IC_ingles if idioma == "ingles" else IC_portugues
     
     tamanho_chave = encontrar_tamanho_chave_ic(texto_cifrado, IC_ESPERADO)
+    ans = []
+    for l in ['a','e','t']:
+        chave = calcular_chave_otimizada(texto_cifrado, tamanho_chave, l)
+        texto_decifrado = decifrar_com_vigenere(texto_cifrado, chave)
+        ans.append((texto_decifrado, idioma))
 
-    chave = calcular_chave_otimizada(texto_cifrado, tamanho_chave, frequencia_idioma)
-
-    texto_decifrado = decifrar_com_vigenere(texto_cifrado, chave)
-
-    return (texto_decifrado, idioma)
+    return ans
 
 
 # Executar o programa
 caminho_do_arquivo_PT = "./20201-teste-PT.txt"
 caminho_do_arquivo_EN = "./20201-teste-EN.txt"
 for file in [caminho_do_arquivo_PT, caminho_do_arquivo_EN]:
-    texto, idioma = decifrar_texto(caminho_do_arquivo_PT)
-    print("Testes base. Texto Decifrado no idioma", texto[:40], "no idioma:", idioma)
+    respostas = decifrar_texto(caminho_do_arquivo_PT)
+    for r in respostas:
+        texto, idioma = r
+        print("Testes base. Texto Decifrado no idioma", texto[:40], "no idioma:", idioma)
     
 print("-------")
 import threading
@@ -215,9 +227,9 @@ def thread_function(i):
     texto, idioma = decifrar_texto("./testFiles/cipher"+str(i)+".txt")
     print("Decifrando arquivo teste: cipher", i, "Texto Decifrado no idioma", texto[:40], "no idioma:", idioma)
 
-#for i in [1,14,23]:
+#
 threads = []
-for i in range(1, 3):
+for i in range(1, 0):
     thread = threading.Thread(target=thread_function, args=(i,))
     threads.append(thread)
     thread.start()
