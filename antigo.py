@@ -140,10 +140,12 @@ def determinar_idioma(texto_cifrado):
 
 import encontrar_tamanho_chave_ic as ec
 import calcular_chave_otimizada as cco
+import ler_texto_cifrado as ltc
+
 # Função principal do programa
 def decifrar_texto(caminho_do_arquivo):
     print("Lendo o texto cifrado...")
-    texto_cifrado = ler_texto_cifrado(caminho_do_arquivo).lower()
+    texto_cifrado = ltc.ler_texto_cifrado(caminho_do_arquivo).lower()
 
     print("Determinando o idioma...")
     idioma = determinar_idioma(texto_cifrado)

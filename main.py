@@ -2,21 +2,6 @@ from pycipher import Vigenere
 from collections import Counter
 
 
-
-# Parte 1: Leitura do Texto Cifrado
-def ler_texto_cifrado(caminho_do_arquivo):
-    with open(caminho_do_arquivo, 'r') as arquivo:
-        return arquivo.read()
-
-
-def indice_de_coincidencia(segmento):
-    n = len(segmento)
-    freqs = Counter(segmento)
-    ic = sum(f * (f - 1) for f in freqs.values()) / (n * (n - 1))
-    return ic
-
-
-# Parte 4: Tabelas de Frequência de Letras
 frequencia_portugues = {
     'a': 14.63,
     'b': 1.04,
@@ -75,6 +60,41 @@ frequencia_ingles = {
     'z': 0.074
 }
 
+frequencia_ingles_10 = {
+        'E': 12.702,
+        'T': 9.056,
+        'A': 8.167,
+        'O': 7.507,
+        'I': 6.966,
+        'N': 6.749,
+        'S': 6.327,
+        'H': 6.094,
+        'R': 5.987,
+        'D': 4.253,
+        'L': 4.025,
+        'C': 2.782,
+        'U': 2.758
+    }
+
+frequencia_portugues_10 = {
+        'A': 14.63,
+        'E': 12.57,
+        'O': 10.73,
+        'S': 7.81,
+        'R': 6.53,
+        'I': 6.18,
+        'N': 5.05,
+        'D': 4.99,
+        'M': 4.74,
+        'U': 4.63,
+        'T': 4.34,
+        'C': 3.88,
+        'L': 2.78
+    }
+
+
+IC_ingles = 0.0667
+IC_portugues = 0.0745
 
 # Função para decifrar o texto usando a Cifra de Vigenère
 def decifrar_com_vigenere(texto_cifrado, chave):
@@ -114,50 +134,22 @@ def determinar_idioma_qui_cubo_alterado(texto_cifrado, frequencia_esperada_ingle
 
 import encontrar_tamanho_chave_ic as etc
 import calcular_chave_otimizada as cco
-
+import ler_texto_cifrado as ltc
 # Função principal do programa
+
+
+
 def decifrar_texto(caminho_do_arquivo):
     
-    frequencia_ingles_10 = {
-    'E': 12.702,
-    'T': 9.056,
-    'A': 8.167,
-    'O': 7.507,
-    'I': 6.966,
-    'N': 6.749,
-    'S': 6.327,
-    'H': 6.094,
-    'R': 5.987,
-    'D': 4.253,
-    'L': 4.025,
-    'C': 2.782,
-    'U': 2.758
-}
+    
 
-    frequencia_portugues_10 = {
-    'A': 14.63,
-    'E': 12.57,
-    'O': 10.73,
-    'S': 7.81,
-    'R': 6.53,
-    'I': 6.18,
-    'N': 5.05,
-    'D': 4.99,
-    'M': 4.74,
-    'U': 4.63,
-    'T': 4.34,
-    'C': 3.88,
-    'L': 2.78
-}
-
-    texto_cifrado = ler_texto_cifrado(caminho_do_arquivo).lower()
+    texto_cifrado = ltc.ler_texto_cifrado(caminho_do_arquivo).lower()
 
     idioma = determinar_idioma_qui_cubo_alterado(texto_cifrado,frequencia_ingles_10,frequencia_portugues_10 )
 
     frequencia_idioma = frequencia_portugues if idioma == "portugues" else frequencia_ingles
 
-    IC_ingles = 0.0667
-    IC_portugues = 0.0745
+
     IC_ESPERADO = IC_ingles if idioma == "ingles" else IC_portugues
     
     tamanho_chave = etc.encontrar_tamanho_chave_ic(texto_cifrado, IC_ESPERADO)
@@ -165,7 +157,6 @@ def decifrar_texto(caminho_do_arquivo):
     for l in ['a','e']:
         chave = cco.calcular_chave_otimizada(texto_cifrado, tamanho_chave, l)
         texto_decifrado = decifrar_com_vigenere(texto_cifrado, chave)
-        
         ans.append((texto_decifrado, idioma))
 
     return ans
@@ -186,8 +177,10 @@ print("-------")
 import threading
 
 def thread_function(i):
-    texto, idioma = decifrar_texto("./testFiles/cipher"+str(i)+".txt")
-    print("Decifrando arquivo teste: cipher", i, "Texto Decifrado no idioma", texto[:40], "no idioma:", idioma)
+    respostas = decifrar_texto("./testFiles/cipher"+str(i)+".txt")
+    for r in respostas:
+        texto, idioma = r
+        print("Decifrando arquivo teste: cipher", i, "Texto Decifrado no idioma", texto[:40], "no idioma:", idioma)
 
 #
 threads = []
