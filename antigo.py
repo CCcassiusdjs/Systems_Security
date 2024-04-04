@@ -138,25 +138,27 @@ def determinar_idioma(texto_cifrado):
     similaridade_portugues = calcular_similaridade(frequencia, frequencias_portugues)
     return "portugues" if similaridade_portugues > similaridade_ingles else "ingles"
 
-import encontrar_tamanho_chave_ic as ec
-import calcular_chave_otimizada as cco
-import ler_texto_cifrado as ltc
+
 
 # Função principal do programa
+
+import encontrar_tamanho_chave_ic as etc
+import calcular_chave_otimizada as cco
+import ler_texto_cifrado as ltc
+import lingua_helpers as lh
+import determinar_idioma as di
+
+
+
 def decifrar_texto(caminho_do_arquivo):
-    print("Lendo o texto cifrado...")
+    
     texto_cifrado = ltc.ler_texto_cifrado(caminho_do_arquivo).lower()
 
-    print("Determinando o idioma...")
-    idioma = determinar_idioma(texto_cifrado)
-    frequencia_idioma = frequencia_portugues if idioma == "portugues" else frequencia_ingles
-    IC_ingles = 0.0667
-    IC_portugues = 0.0745
-    IC_ESPERADO = IC_ingles if idioma == "ingles" else IC_portugues
+    idioma = di.determinar_idioma(texto_cifrado,lh.frequencia_ingles_10,lh.frequencia_portugues_10 )
+
+    IC_ESPERADO = lh.get_IC_Esperado(idioma)
     
-    tamanho_chave = ec.encontrar_tamanho_chave_ic(texto_cifrado, IC_ESPERADO)
-    print("tamanho chave: ", tamanho_chave)
-    print("Calculando a chave otimizada...")
+    tamanho_chave = etc.encontrar_tamanho_chave_ic(texto_cifrado, IC_ESPERADO)
 
     chave = cco.calcular_chave_otimizada(texto_cifrado, tamanho_chave, 'e')
 
@@ -166,6 +168,7 @@ def decifrar_texto(caminho_do_arquivo):
     return texto_decifrado, idioma
 
 
+print("ANTIGO")
 # Executar o programa
 caminho_do_arquivo = "./20201-teste2.txt"
 

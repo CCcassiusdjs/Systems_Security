@@ -2,164 +2,55 @@ from pycipher import Vigenere
 from collections import Counter
 
 
-frequencia_portugues = {
-    'a': 14.63,
-    'b': 1.04,
-    'c': 3.88,
-    'd': 4.99,
-    'e': 12.57,
-    'f': 1.02,
-    'g': 1.30,
-    'h': 1.28,
-    'i': 6.18,
-    'j': 0.40,
-    'k': 0.02,
-    'l': 2.78,
-    'm': 4.74,
-    'n': 5.05,
-    'o': 10.73,
-    'p': 2.52,
-    'q': 1.20,
-    'r': 6.53,
-    's': 7.81,
-    't': 4.34,
-    'u': 4.63,
-    'v': 1.67,
-    'w': 0.01,
-    'x': 0.21,
-    'y': 0.01,
-    'z': 0.47
-}
-
-frequencia_ingles = {
-    'a': 8.167,
-    'b': 1.492,
-    'c': 2.782,
-    'd': 4.253,
-    'e': 12.702,
-    'f': 2.228,
-    'g': 2.015,
-    'h': 6.094,
-    'i': 6.966,
-    'j': 0.153,
-    'k': 0.772,
-    'l': 4.025,
-    'm': 2.406,
-    'n': 6.749,
-    'o': 7.507,
-    'p': 1.929,
-    'q': 0.095,
-    'r': 5.987,
-    's': 6.327,
-    't': 9.056,
-    'u': 2.758,
-    'v': 0.978,
-    'w': 2.360,
-    'x': 0.150,
-    'y': 1.974,
-    'z': 0.074
-}
-
-frequencia_ingles_10 = {
-        'E': 12.702,
-        'T': 9.056,
-        'A': 8.167,
-        'O': 7.507,
-        'I': 6.966,
-        'N': 6.749,
-        'S': 6.327,
-        'H': 6.094,
-        'R': 5.987,
-        'D': 4.253,
-        'L': 4.025,
-        'C': 2.782,
-        'U': 2.758
-    }
-
-frequencia_portugues_10 = {
-        'A': 14.63,
-        'E': 12.57,
-        'O': 10.73,
-        'S': 7.81,
-        'R': 6.53,
-        'I': 6.18,
-        'N': 5.05,
-        'D': 4.99,
-        'M': 4.74,
-        'U': 4.63,
-        'T': 4.34,
-        'C': 3.88,
-        'L': 2.78
-    }
-
-
-IC_ingles = 0.0667
-IC_portugues = 0.0745
-
-# Função para decifrar o texto usando a Cifra de Vigenère
 def decifrar_com_vigenere(texto_cifrado, chave):
     vigenere = Vigenere(chave)
     return vigenere.decipher(texto_cifrado)
 
 
-def calcular_frequencia(texto):
-    texto = texto.replace(" ", "").upper()
-    frequencia = {}
-    for letra in texto:
-        if letra.isalpha():
-            frequencia[letra] = frequencia.get(letra, 0) + 1
-    total_letras = sum(frequencia.values())
-    for letra in frequencia:
-        frequencia[letra] = (frequencia[letra] / total_letras) * 100
-    return frequencia
-
-
-
-def calcular_qui_cubo_alterado(observado, esperado):
-    qui_quadrado = 0
-    for letra in observado:
-        if letra in esperado:
-            qui_quadrado += ((observado.get(letra, 0) - esperado.get(letra, 0)) ** 3) / esperado.get(letra, 1)
-    return qui_quadrado
-
-def determinar_idioma_qui_cubo_alterado(texto_cifrado, frequencia_esperada_ingles, frequencia_esperada_portugues):
-    frequencia_observada = calcular_frequencia(texto_cifrado)
-
-    qui_quadrado_ingles = calcular_qui_cubo_alterado(frequencia_observada, frequencia_esperada_ingles)
-    qui_quadrado_portugues = calcular_qui_cubo_alterado(frequencia_observada, frequencia_esperada_portugues)
-
-
-    return "portugues" if float(qui_quadrado_portugues) < float(qui_quadrado_ingles) else "ingles"
-
-
 import encontrar_tamanho_chave_ic as etc
 import calcular_chave_otimizada as cco
 import ler_texto_cifrado as ltc
-# Função principal do programa
-
+import lingua_helpers as lh
+import determinar_idioma as di
 
 
 def decifrar_texto(caminho_do_arquivo):
     
-    
-
     texto_cifrado = ltc.ler_texto_cifrado(caminho_do_arquivo).lower()
 
-    idioma = determinar_idioma_qui_cubo_alterado(texto_cifrado,frequencia_ingles_10,frequencia_portugues_10 )
+    idioma = di.determinar_idioma(texto_cifrado,lh.frequencia_ingles_10,lh.frequencia_portugues_10 )
 
-    frequencia_idioma = frequencia_portugues if idioma == "portugues" else frequencia_ingles
-
-
-    IC_ESPERADO = IC_ingles if idioma == "ingles" else IC_portugues
+    IC_ESPERADO = lh.get_IC_Esperado(idioma)
     
     tamanho_chave = etc.encontrar_tamanho_chave_ic(texto_cifrado, IC_ESPERADO)
     ans = []
-    for l in ['a','e']:
-        chave = cco.calcular_chave_otimizada(texto_cifrado, tamanho_chave, l)
-        texto_decifrado = decifrar_com_vigenere(texto_cifrado, chave)
-        ans.append((texto_decifrado, idioma))
+
+    chave = cco.calcular_chave_otimizada(texto_cifrado, tamanho_chave, 'e')
+    texto_decifrado = decifrar_com_vigenere(texto_cifrado, chave)
+    ans.append((texto_decifrado, idioma))
 
     return ans
+
+
+
+
+import threading
+
+def testFiles(until):
+    print("-------Init cyoher tests files")
+    def thread_function(i):
+        respostas = decifrar_texto("./testFiles/cipher"+str(i)+".txt")
+        for r in respostas:
+            texto, idioma = r
+            print("Decifrando arquivo teste: cipher", i, "Texto Decifrado no idioma", texto[:40], "no idioma:", idioma)
+            
+        return
+    
+    
+    for i in range(1, until+1):
+        thread_function(i)
+
+
 
 
 # Executar o programa
@@ -172,25 +63,12 @@ for file in [caminho_do_arquivo_PT, caminho_do_arquivo_EN]:
         print("Testes base. Texto Decifrado no idioma", texto[:40], "no idioma:", idioma)
     
     
-   
-print("-------")
-import threading
-
-def thread_function(i):
-    respostas = decifrar_texto("./testFiles/cipher"+str(i)+".txt")
-    for r in respostas:
-        texto, idioma = r
-        print("Decifrando arquivo teste: cipher", i, "Texto Decifrado no idioma", texto[:40], "no idioma:", idioma)
-
-#
-threads = []
-for i in range(1, 5):
-    thread_function(i)
-    # thread = threading.Thread(target=thread_function, args=(i,))
-    # threads.append(thread)
-    # thread.start()
-
+caminho_do_arquivo_PT = "./20201-teste-PT.txt"
+caminho_do_arquivo_EN = "./20201-teste-EN.txt"
+for file in [caminho_do_arquivo_PT, caminho_do_arquivo_EN]:
+    r = decifrar_texto(file)
+    print(r)
     
-# for thread in threads:
-#     thread.join()
-
+    
+  
+testFiles(3)
