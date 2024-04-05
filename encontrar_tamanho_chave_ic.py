@@ -25,7 +25,7 @@ def encontrar_tamanho_chave_ic(texto_cifrado, IC_ESPERADO):
         ic_medio = sum(indice_de_coincidencia(segmento) for segmento in segmentos) / tamanho
         diferenca = abs(IC_ESPERADO - ic_medio)
         
-        if diferenca*1.015 < melhor_diferenca: # tem que ser 1.5% melhor que a ultima chave
+        if diferenca*1.015 < melhor_diferenca: # tem que ser 1.5% melhor que a ultima chave (baseado em testes)
             melhor_diferenca = diferenca
             melhor_tamanho = tamanho
 

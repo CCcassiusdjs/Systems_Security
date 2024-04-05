@@ -19,7 +19,7 @@ def calcular_frequencia(texto):
     return frequencia
 
 
-
+#método inspirado no qui quadrado, porém alterado baseado em testes
 def calcular_qui_cubo_alterado(observado, esperado):
     qui_quadrado = 0
     for letra in observado:

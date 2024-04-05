@@ -28,6 +28,7 @@ def escolhaDoUsuario():
 def determinaListaDeIdiomas(texto):
     idiomaProvavel = di.determinar_idioma(texto,lh.frequencia_ingles_10,lh.frequencia_portugues_10 )
     idiomas = ['portugues', 'ingles']
+    #idioma com maior probabilidade é testado primeiro
     if idiomas[0] != idiomaProvavel:
         idiomas.reverse()
     return idiomas

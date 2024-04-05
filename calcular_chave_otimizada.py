@@ -7,7 +7,7 @@ Created on Thu Apr  4 16:53:32 2024
 """
 from collections import Counter
 
-
+#metodo mais rapido
 def calcular_chave_otimizada_rapido(texto_cifrado, tamanho_chave, letra_mais_frequente_idioma):
     chave_otimizada = ''
     for i in range(tamanho_chave):
@@ -28,10 +28,7 @@ def calcular_chave_otimizada_rapido(texto_cifrado, tamanho_chave, letra_mais_fre
     return chave_otimizada
 
 
-# Frequências das letras em português
-
-
-# Reajustando a função para usar as frequências de letras em português
+#metodo mais lento
 def calcular_chave_otimizada(texto_cifrado, tamanho_chave, frequencia_idioma):
     chave_otimizada = ''
 
