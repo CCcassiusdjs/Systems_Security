@@ -8,7 +8,7 @@ Created on Thu Apr  4 16:53:32 2024
 from collections import Counter
 
 
-def calcular_chave_otimizada2(texto_cifrado, tamanho_chave, letra_mais_frequente_idioma):
+def calcular_chave_otimizada_rapido(texto_cifrado, tamanho_chave, letra_mais_frequente_idioma):
     chave_otimizada = ''
     for i in range(tamanho_chave):
         # Extrai o segmento do texto que corresponde à mesma posição da chave

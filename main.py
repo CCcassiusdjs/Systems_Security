@@ -33,13 +33,18 @@ def determinaListaDeIdiomas(texto):
     return idiomas
 
 
-def decifraTextoIdiomaDescoberto(texto_cifrado,idioma, frequenciaAlfabeto, IC_ESPERADO):
+def decifraTextoIdiomaDescoberto(texto_cifrado,idioma, frequenciaAlfabeto, tamanho_chave):
+    #jeito rapido
+    chave = cco.calcular_chave_otimizada_rapido(texto_cifrado, tamanho_chave, 'e')
+    texto_decifrado = decifrar_com_vigenere(texto_cifrado, chave)
+    print("usando método rápido: Texto Decifrado", texto_decifrado[:40], "no idioma provável:", idioma)
+    print("Interrompa no teclado quando achar o texto claro, quiser trocar de lingua ou quiser finalizar")
+    #jeito lento
     for frequencia_combinada in gf.gerador_de_frequencias(frequenciaAlfabeto,numeroDeCombinacoes): 
         try:
-            tamanho_chave = etc.encontrar_tamanho_chave_ic(texto_cifrado, IC_ESPERADO)
             chave = cco.calcular_chave_otimizada(texto_cifrado, tamanho_chave, frequencia_combinada)
             texto_decifrado = decifrar_com_vigenere(texto_cifrado, chave)
-            print("Texto Decifrado", texto_decifrado[:40], "no idioma:", idioma)
+            print("Texto Decifrado", texto_decifrado[:40], "no idioma provável:", idioma)
         except KeyboardInterrupt:
             escolha = escolhaDoUsuario()
             if escolha == '1' or escolha == '3':
@@ -58,7 +63,9 @@ def decifrar_texto(caminho_do_arquivo):
     for idioma in idiomas:
         IC_ESPERADO = lh.get_IC_Esperado(idioma)
         frequenciaAlfabeto =  lh.frequenciasAlfabetos[idioma]
-        decifraTextoIdiomaDescoberto(texto_cifrado,idioma, frequenciaAlfabeto, IC_ESPERADO)
+        tamanho_chave = etc.encontrar_tamanho_chave_ic(texto_cifrado, IC_ESPERADO)
+        
+        decifraTextoIdiomaDescoberto(texto_cifrado,idioma, frequenciaAlfabeto, tamanho_chave)
         
     return
 
@@ -67,11 +74,11 @@ def decifrar_texto(caminho_do_arquivo):
 
 
 
-# Executar o programa
+# Testes
     
 caminho_do_arquivo_PT = "./20201-teste-PT.txt"
 caminho_do_arquivo_EN = "./20201-teste-EN.txt"
-for file in [caminho_do_arquivo_EN]:
+for file in [caminho_do_arquivo_PT, caminho_do_arquivo_EN]:
     decifrar_texto(file)
     
 
@@ -89,5 +96,7 @@ def testFiles(until):
     for i in range(1, until+1):
         thread_function(i)
     
-  
+testFiles(31)
+
+# log de encerramento
 print("encerrando programa")
