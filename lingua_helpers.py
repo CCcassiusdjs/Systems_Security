@@ -15,6 +15,7 @@ def get_IC_Esperado(idioma):
 
 
 
+
 frequencia_portugues = {
     'a': 14.63,
     'b': 1.04,
@@ -72,6 +73,12 @@ frequencia_ingles = {
     'x': 0.150,
     'y': 1.974,
     'z': 0.074
+}
+
+frequenciasAlfabetos = {
+    'portugues': frequencia_portugues,
+    'ingles': frequencia_ingles
+    
 }
 
 

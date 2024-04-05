@@ -1,5 +1,5 @@
 from pycipher import Vigenere
-from collections import Counter
+import sys
 
 
 def decifrar_com_vigenere(texto_cifrado, chave):
@@ -16,14 +16,24 @@ import gerador_de_frequencias as gf
 
 numeroDeCombinacoes = 10
 
-def decifrar_texto(caminho_do_arquivo):
-    
-    texto_cifrado = ltc.ler_texto_cifrado(caminho_do_arquivo).lower()
+def escolhaDoUsuario():
+    opcoes = ''' 
+    1 - achei a mensagem cifrada, termine o programa
+    2 - quero trocar de língua
+    3 - finalize o programa
+    '''
+    return input(opcoes)
 
-    idioma = di.determinar_idioma(texto_cifrado,lh.frequencia_ingles_10,lh.frequencia_portugues_10 )
 
-    IC_ESPERADO = lh.get_IC_Esperado(idioma)
-    frequenciaAlfabeto =  lh.frequencia_portugues if idioma == 'portugues' else lh.frequencia_ingles
+def determinaListaDeIdiomas(texto):
+    idiomaProvavel = di.determinar_idioma(texto,lh.frequencia_ingles_10,lh.frequencia_portugues_10 )
+    idiomas = ['portugues', 'ingles']
+    if idiomas[0] != idiomaProvavel:
+        idiomas.reverse()
+    return idiomas
+
+
+def decifraTextoIdiomaDescoberto(texto_cifrado,idioma, frequenciaAlfabeto, IC_ESPERADO):
     for frequencia_combinada in gf.gerador_de_frequencias(frequenciaAlfabeto,numeroDeCombinacoes): 
         try:
             tamanho_chave = etc.encontrar_tamanho_chave_ic(texto_cifrado, IC_ESPERADO)
@@ -31,10 +41,25 @@ def decifrar_texto(caminho_do_arquivo):
             texto_decifrado = decifrar_com_vigenere(texto_cifrado, chave)
             print("Texto Decifrado", texto_decifrado[:40], "no idioma:", idioma)
         except KeyboardInterrupt:
-            entrada = input("\n Qual está correto?")
+            escolha = escolhaDoUsuario()
+            if escolha == '1' or escolha == '3':
+                print("encerrando programa")
+                sys.exit()
+                return
+            if escolha == '2':
+                break
+            else:
+                continue
 
-            break
-
+def decifrar_texto(caminho_do_arquivo):
+    texto_cifrado = ltc.ler_texto_cifrado(caminho_do_arquivo).lower()
+    idiomas = determinaListaDeIdiomas(texto_cifrado)
+    
+    for idioma in idiomas:
+        IC_ESPERADO = lh.get_IC_Esperado(idioma)
+        frequenciaAlfabeto =  lh.frequenciasAlfabetos[idioma]
+        decifraTextoIdiomaDescoberto(texto_cifrado,idioma, frequenciaAlfabeto, IC_ESPERADO)
+        
     return
 
 
@@ -46,7 +71,7 @@ def decifrar_texto(caminho_do_arquivo):
     
 caminho_do_arquivo_PT = "./20201-teste-PT.txt"
 caminho_do_arquivo_EN = "./20201-teste-EN.txt"
-for file in [caminho_do_arquivo_PT, caminho_do_arquivo_EN]:
+for file in [caminho_do_arquivo_EN]:
     decifrar_texto(file)
     
 
@@ -65,4 +90,4 @@ def testFiles(until):
         thread_function(i)
     
   
-#testFiles(3)
+print("encerrando programa")
