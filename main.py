@@ -83,18 +83,15 @@ for file in [caminho_do_arquivo_PT, caminho_do_arquivo_EN]:
     
 
 def testFiles(until):
-    print("-------Init cyoher tests files")
-    def thread_function(i):
+    print("-------Init tests files")
+    
+    for i in range(1, until+1):
         respostas = decifrar_texto("./testFiles/cipher"+str(i)+".txt")
         for r in respostas:
             texto, idioma = r
             print("Decifrando arquivo teste: cipher", i, "Texto Decifrado no idioma", texto[:40], "no idioma:", idioma)
             
         return
-    
-    
-    for i in range(1, until+1):
-        thread_function(i)
     
 testFiles(31)
 
