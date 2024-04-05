@@ -4,13 +4,14 @@
 Created on Thu Apr  4 18:34:12 2024
 
 @author: hpc
+
+}
 """
 
 def get_IC_Esperado(idioma):
     IC_ingles = 0.0667
     IC_portugues = 0.0745
     return IC_ingles if idioma == "ingles" else IC_portugues
-
 
 
 
@@ -43,6 +44,7 @@ frequencia_portugues = {
     'z': 0.47
 }
 
+
 frequencia_ingles = {
     'a': 8.167,
     'b': 1.492,
@@ -71,6 +73,7 @@ frequencia_ingles = {
     'y': 1.974,
     'z': 0.074
 }
+
 
 frequencia_ingles_10 = {
         'E': 12.702,

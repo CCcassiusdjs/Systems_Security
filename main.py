@@ -12,7 +12,9 @@ import calcular_chave_otimizada as cco
 import ler_texto_cifrado as ltc
 import lingua_helpers as lh
 import determinar_idioma as di
+import gerador_de_frequencias as gf
 
+numeroDeCombinacoes = 26
 
 def decifrar_texto(caminho_do_arquivo):
     
@@ -21,20 +23,30 @@ def decifrar_texto(caminho_do_arquivo):
     idioma = di.determinar_idioma(texto_cifrado,lh.frequencia_ingles_10,lh.frequencia_portugues_10 )
 
     IC_ESPERADO = lh.get_IC_Esperado(idioma)
+    frequenciaAlfabeto =  lh.frequencia_portugues if idioma == 'portugues' else lh.frequencia_ingles
+    for frequencia_combinada in gf.gerador_de_frequencias(frequenciaAlfabeto,numeroDeCombinacoes): 
+        tamanho_chave = etc.encontrar_tamanho_chave_ic(texto_cifrado, IC_ESPERADO)
+        chave = cco.calcular_chave_otimizada(texto_cifrado, tamanho_chave, frequencia_combinada)
+        texto_decifrado = decifrar_com_vigenere(texto_cifrado, chave)
+        print("Texto Decifrado", texto_decifrado[:40], "no idioma:", idioma)
+        #print('está correto?')
+        if False:
+            break
+
+    return
+
+
+
+
+
+
+# Executar o programa
     
-    tamanho_chave = etc.encontrar_tamanho_chave_ic(texto_cifrado, IC_ESPERADO)
-    ans = []
-
-    chave = cco.calcular_chave_otimizada(texto_cifrado, tamanho_chave, 'e')
-    texto_decifrado = decifrar_com_vigenere(texto_cifrado, chave)
-    ans.append((texto_decifrado, idioma))
-
-    return ans
-
-
-
-
-import threading
+caminho_do_arquivo_PT = "./20201-teste-PT.txt"
+caminho_do_arquivo_EN = "./20201-teste-EN.txt"
+for file in [caminho_do_arquivo_EN, caminho_do_arquivo_PT]:
+    decifrar_texto(file)
+    
 
 def testFiles(until):
     print("-------Init cyoher tests files")
@@ -49,26 +61,6 @@ def testFiles(until):
     
     for i in range(1, until+1):
         thread_function(i)
-
-
-
-
-# Executar o programa
-caminho_do_arquivo_PT = "./20201-teste-PT.txt"
-caminho_do_arquivo_EN = "./20201-teste-EN.txt"
-for file in [caminho_do_arquivo_PT, caminho_do_arquivo_EN]:
-    respostas = decifrar_texto(caminho_do_arquivo_PT)
-    
-    
-caminho_do_arquivo_PT = "./20201-teste-PT.txt"
-caminho_do_arquivo_EN = "./20201-teste-EN.txt"
-for file in [caminho_do_arquivo_PT, caminho_do_arquivo_EN]:
-    respostas = decifrar_texto(file)
-    for r in respostas:
-        texto, idioma = r
-        print("Testes base. Texto Decifrado no idioma", texto[:40], "no idioma:", idioma)
-    
-    
     
   
-testFiles(3)
+#testFiles(3)
