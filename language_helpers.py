@@ -1,19 +1,7 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Apr  4 18:34:12 2024
-
-@author: hpc
-
-}
-"""
-
 def get_IC_Esperado(idioma):
     IC_ingles = 0.0667
     IC_portugues = 0.0745
     return IC_ingles if idioma == "ingles" else IC_portugues
-
-
 
 
 frequencia_portugues = {
@@ -44,7 +32,6 @@ frequencia_portugues = {
     'y': 0.01,
     'z': 0.47
 }
-
 
 frequencia_ingles = {
     'a': 8.167,
@@ -78,38 +65,37 @@ frequencia_ingles = {
 frequenciasAlfabetos = {
     'portugues': frequencia_portugues,
     'ingles': frequencia_ingles
-    
+
 }
 
-
 frequencia_ingles_10 = {
-        'E': 12.702,
-        'T': 9.056,
-        'A': 8.167,
-        'O': 7.507,
-        'I': 6.966,
-        'N': 6.749,
-        'S': 6.327,
-        'H': 6.094,
-        'R': 5.987,
-        'D': 4.253,
-        'L': 4.025,
-        'C': 2.782,
-        'U': 2.758
-    }
+    'E': 12.702,
+    'T': 9.056,
+    'A': 8.167,
+    'O': 7.507,
+    'I': 6.966,
+    'N': 6.749,
+    'S': 6.327,
+    'H': 6.094,
+    'R': 5.987,
+    'D': 4.253,
+    'L': 4.025,
+    'C': 2.782,
+    'U': 2.758
+}
 
 frequencia_portugues_10 = {
-        'A': 14.63,
-        'E': 12.57,
-        'O': 10.73,
-        'S': 7.81,
-        'R': 6.53,
-        'I': 6.18,
-        'N': 5.05,
-        'D': 4.99,
-        'M': 4.74,
-        'U': 4.63,
-        'T': 4.34,
-        'C': 3.88,
-        'L': 2.78
-    }
+    'A': 14.63,
+    'E': 12.57,
+    'O': 10.73,
+    'S': 7.81,
+    'R': 6.53,
+    'I': 6.18,
+    'N': 5.05,
+    'D': 4.99,
+    'M': 4.74,
+    'U': 4.63,
+    'T': 4.34,
+    'C': 3.88,
+    'L': 2.78
+}
