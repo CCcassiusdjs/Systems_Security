@@ -1,35 +1,35 @@
 from collections import Counter
 
 
-def indice_de_coincidencia(segmento):
-    n = len(segmento)  # Número de caracteres no segmento
-    freqs = Counter(segmento)  # Conta a frequência de cada letra
+def index_of_coincidence(segment):
+    n = len(segment)  # Number of characters in the segment
+    freqs = Counter(segment)  # Counts the frequency of each letter
 
-    # Calcula o IC com base na frequência de cada letra
+    # Calculates the IoC based on the frequency of each letter
     ic = sum(f * (f - 1) for f in freqs.values()) / (n * (n - 1))
     return ic
 
 
-def encontrar_tamanho_chave_ic(texto_cifrado, IC_ESPERADO):
-    tamanho_max_chave = 20  # Limite para o tamanho da chave
+def find_key_length_ic(ciphered_text, EXPECTED_IC):
+    max_key_length = 20  # Limit for the key length
 
-    melhor_tamanho = 1
-    melhor_diferenca = float('inf')
+    best_length = 1
+    smallest_difference = float('inf')
 
-    # Testa cada tamanho de chave possível até o limite
-    for tamanho in range(1, tamanho_max_chave + 1):
-        # Divide o texto cifrado em segmentos com base no tamanho da chave
-        segmentos = [''.join(texto_cifrado[i::tamanho]) for i in range(tamanho)]
+    # Tests each possible key length up to the limit
+    for length in range(1, max_key_length + 1):
+        # Divides the ciphered text into segments based on the key length
+        segments = [''.join(ciphered_text[i::length]) for i in range(length)]
 
-        # Calcula o IC médio para todos os segmentos
-        ic_medio = sum(indice_de_coincidencia(segmento) for segmento in segmentos) / tamanho
+        # Calculates the average IoC for all segments
+        average_ic = sum(index_of_coincidence(segment) for segment in segments) / length
 
-        # Calcula a diferença entre o IC médio e o IC esperado
-        diferenca = abs(IC_ESPERADO - ic_medio)
+        # Calculates the difference between the average IoC and the expected IoC
+        difference = abs(EXPECTED_IC - average_ic)
 
-        # Adiciona um limiar de melhoria de 1.5% para escolher um novo melhor tamanho
-        if diferenca * 1.015 < melhor_diferenca:
-            melhor_diferenca = diferenca
-            melhor_tamanho = tamanho
+        # Adds a 1.5% improvement threshold to choose a new best length
+        if difference * 1.015 < smallest_difference:
+            smallest_difference = difference
+            best_length = length
 
-    return melhor_tamanho
+    return best_length

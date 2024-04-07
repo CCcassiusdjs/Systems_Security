@@ -1,15 +1,16 @@
-from decipher import decifrar_texto
+from decipher import decrypt_text
 
-# Para os arquivos específicos com interação do usuário
-arquivos_interativos = ["./20201-teste-PT.txt", "./20201-teste-EN.txt"]
-for arquivo in arquivos_interativos:
-    if not decifrar_texto(arquivo):
+# For specific files with user interaction
+interactive_files = ["./20201-TESTE-PT.txt", "./20201-TESTE-EN.txt"]
+for file in interactive_files:
+    if not decrypt_text(file):
         break
 
-# Para os testes automáticos sem interação do usuário
+# For automatic tests without user interaction
 for i in range(1, 32):
-    print("Decifrando arquivo {}...".format(i))
-    decifrar_texto(f"./testFiles/cipher{i}.txt", interacao_usuario=False)
+    print("Decrypting file {}...".format(i))
+    decrypt_text(f"./testFiles/cipher{i}.txt", user_interaction=False)
 
-print("Encerramento dos testes.")
+print("Tests completed.")
+
 

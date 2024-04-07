@@ -1,64 +1,64 @@
 from collections import Counter
 
 
-def calcular_chave_otimizada_rapido(texto_cifrado, tamanho_chave, letra_mais_frequente_idioma):
-    chave_otimizada = ''
-    for i in range(tamanho_chave):
-        # Extrai o segmento do texto que corresponde à mesma posição da chave
-        segmento = texto_cifrado[i::tamanho_chave]
+def calculate_optimized_key_quick(ciphered_text, key_length, most_frequent_letter_language):
+    optimized_key = ''
+    for i in range(key_length):
+        # Extracts the segment of the text corresponding to the same position in the key
+        segment = ciphered_text[i::key_length]
 
-        # Conta a frequência das letras no segmento
-        contador = Counter(segmento)
+        # Counts the frequency of letters in the segment
+        counter = Counter(segment)
 
-        # Encontra a letra mais frequente no segmento
-        letra_mais_frequente = max(contador, key=contador.get)
+        # Finds the most frequent letter in the segment
+        most_frequent_letter = max(counter, key=counter.get)
 
-        # Calcula o deslocamento da letra mais frequente até a letra mais frequente do idioma
-        deslocamento = ord(letra_mais_frequente) - ord(letra_mais_frequente_idioma)
+        # Calculates the shift from the most frequent letter to the most frequent letter in the language
+        shift = ord(most_frequent_letter) - ord(most_frequent_letter_language)
 
-        # Corrige o deslocamento para o intervalo de 0-25 e adiciona à chave
-        chave_otimizada += chr((deslocamento + 26) % 26 + ord('a'))
+        # Corrects the shift to be within the range of 0-25 and adds it to the key
+        optimized_key += chr((shift + 26) % 26 + ord('a'))
 
-    return chave_otimizada
-
-
-def calcular_chave_otimizada(texto_cifrado, tamanho_chave, frequencia_idioma):
-    chave_otimizada = ''
-
-    for i in range(tamanho_chave):
-        segmento = texto_cifrado[i::tamanho_chave]
-        contador = Counter(segmento)
-
-        melhor_desvio = float('inf')
-        melhor_letra = ''
-
-        # Compara cada letra possível com a frequência das letras no segmento
-        for letra_chave in frequencia_idioma:
-            desvio_total = 0
-
-            # Calcula o desvio entre a frequência observada e esperada
-            for letra, freq in contador.items():
-                letra_deslocada = chr((ord(letra) - ord(letra_chave)) % 26 + ord('a'))
-                desvio_total += abs(frequencia_idioma.get(letra_deslocada, 0) - freq)
-
-            # Seleciona a letra que minimiza o desvio total
-            if desvio_total < melhor_desvio:
-                melhor_desvio = desvio_total
-                melhor_letra = letra_chave
-
-        chave_otimizada += melhor_letra
-
-    return chave_otimizada
+    return optimized_key
 
 
-# Exemplo das funções otimizadas
-texto_cifrado = "exemplo cifrado para teste"
-tamanho_chave = 3
-letra_mais_frequente_idioma = 'e'
-frequencia_idioma = {'e': 0.12702, 't': 0.09056, 'a': 0.08167}  # exemplo de frequências
+def calculate_optimized_key(ciphered_text, key_length, language_frequency):
+    optimized_key = ''
 
-# Chamada das funções otimizadas
-chave_rapida = calcular_chave_otimizada_rapido(texto_cifrado, tamanho_chave, letra_mais_frequente_idioma)
-chave_lenta = calcular_chave_otimizada(texto_cifrado, tamanho_chave, frequencia_idioma)
+    for i in range(key_length):
+        segment = ciphered_text[i::key_length]
+        counter = Counter(segment)
 
-var = chave_rapida, chave_lenta
+        best_deviation = float('inf')
+        best_letter = ''
+
+        # Compares each possible letter with the frequency of letters in the segment
+        for key_letter in language_frequency:
+            total_deviation = 0
+
+            # Calculates the deviation between observed and expected frequency
+            for letter, freq in counter.items():
+                shifted_letter = chr((ord(letter) - ord(key_letter)) % 26 + ord('a'))
+                total_deviation += abs(language_frequency.get(shifted_letter, 0) - freq)
+
+            # Selects the letter that minimizes the total deviation
+            if total_deviation < best_deviation:
+                best_deviation = total_deviation
+                best_letter = key_letter
+
+        optimized_key += best_letter
+
+    return optimized_key
+
+
+# Example of optimized functions usage
+ciphered_text = "example ciphered text for testing"
+key_length = 3
+most_frequent_letter_language = 'e'
+language_frequency = {'e': 0.12702, 't': 0.09056, 'a': 0.08167}  # example frequencies
+
+# Calling the optimized functions
+quick_key = calculate_optimized_key_quick(ciphered_text, key_length, most_frequent_letter_language)
+slow_key = calculate_optimized_key(ciphered_text, key_length, language_frequency)
+
+var = quick_key, slow_key

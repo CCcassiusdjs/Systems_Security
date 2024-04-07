@@ -1,19 +1,19 @@
 import itertools
 
 
-def gerador_de_frequencias(frequencias, n_top_letras):
-    # Ordenar as letras pela frequência e pegar as top N mais frequentes
-    letras_mais_frequentes = sorted(frequencias, key=frequencias.get, reverse=True)[:n_top_letras]
+def frequency_generator(frequencies, n_top_letters):
+    # Sort the letters by frequency and get the top N most frequent
+    most_frequent_letters = sorted(frequencies, key=frequencies.get, reverse=True)[:n_top_letters]
 
-    # Gerar todas as permutações possíveis dessas letras
-    permutacoes = itertools.permutations(letras_mais_frequentes)
+    # Generate all possible permutations of these letters
+    permutations = itertools.permutations(most_frequent_letters)
 
-    # Iterar sobre cada permutação para criar um novo dicionário de frequências
-    for permutacao in permutacoes:
-        nova_frequencia = frequencias.copy()  # Copia o dicionário de frequências original
+    # Iterate over each permutation to create a new frequency dictionary
+    for permutation in permutations:
+        new_frequency = frequencies.copy()  # Copies the original frequency dictionary
 
-        # Atribuir as frequências das letras permutadas
-        for i, letra in enumerate(letras_mais_frequentes):
-            nova_frequencia[letra] = frequencias[permutacao[i]]
+        # Assign the frequencies of the permuted letters
+        for i, letter in enumerate(most_frequent_letters):
+            new_frequency[letter] = frequencies[permutation[i]]
 
-        yield nova_frequencia  # Retorna o novo dicionário de frequências
+        yield new_frequency  # Returns the new frequency dictionary

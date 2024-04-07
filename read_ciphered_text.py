@@ -1,3 +1,3 @@
-def ler_texto_cifrado(caminho_do_arquivo):
-    with open(caminho_do_arquivo, 'r') as arquivo:
-        return arquivo.read()
+def read_ciphered_text(file_path):
+    with open(file_path, 'r') as file:
+        return file.read()
