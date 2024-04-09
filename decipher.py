@@ -114,7 +114,7 @@ def decryptTextLanguageDiscovered(ciphered_text, language, alphabetFrequency, ke
 # Main function to decrypt ciphered texts.
 def decrypt_text(file_path, user_interaction=True):
     # Read ciphered text from the file
-    ciphered_text = ltc.read_ciphered_text(file_path).lower()
+    ciphered_text = ltc.read_ciphered_text(file_path).lower()[:10000]
     # Determine possible languages of the text
     languages = determineLanguageList(ciphered_text)
 

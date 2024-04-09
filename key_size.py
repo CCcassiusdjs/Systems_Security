@@ -7,7 +7,7 @@ def index_of_coincidence(segment):
 
     # Calculates the IoC based on the frequency of each letter
     ic = sum(f * (f - 1) for f in freqs.values()) / (n * (n - 1))
-    return ic
+    return ic.__round__(3)
 
 
 def find_key_length_ic(ciphered_text, EXPECTED_IC):
